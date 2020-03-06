@@ -1,0 +1,129 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:1-20:12
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:1-20:12
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:1-20:12
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:1-20:12
+MERGED from [com.android.support:leanback-v17:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/13e4ef0cea1b5be9543ca375317a7aad/leanback-v17-26.1.0/AndroidManifest.xml:17:1-28:12
+MERGED from [com.android.support:support-fragment:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/3510dcad850f5a33674b7ed1ffd01865/support-fragment-26.1.0/AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:recyclerview-v7:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/bcc2e825d05212765022895fc3e669b5/recyclerview-v7-26.1.0/AndroidManifest.xml:17:1-28:12
+MERGED from [com.android.support:support-core-ui:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/f4a4de359bb71e3ff551206cdce8ad96/support-core-ui-26.1.0/AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:support-media-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/a31ec6f6fa52cc8fbc645871a11eebc3/support-media-compat-26.1.0/AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:support-core-utils:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/9b60b442c18603343137db4eda9b65f6/support-core-utils-26.1.0/AndroidManifest.xml:17:1-31:12
+MERGED from [com.android.support:support-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/220c9c180e8e9618ecf7bb8e2f1eddbb/support-compat-26.1.0/AndroidManifest.xml:17:1-31:12
+MERGED from [android.arch.lifecycle:runtime:1.0.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/1f45d69d51a7cd9269ac5863e813b302/runtime-1.0.0/AndroidManifest.xml:17:1-30:12
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:1-20:12
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:1-20:12
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:1-20:12
+	package
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:3:5-44
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:1-20:12
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:1-20:12
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:2:11-69
+application
+ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:5:5-18:19
+MERGED from [com.android.support:leanback-v17:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/13e4ef0cea1b5be9543ca375317a7aad/leanback-v17-26.1.0/AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:leanback-v17:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/13e4ef0cea1b5be9543ca375317a7aad/leanback-v17-26.1.0/AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:support-fragment:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/3510dcad850f5a33674b7ed1ffd01865/support-fragment-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-fragment:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/3510dcad850f5a33674b7ed1ffd01865/support-fragment-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:recyclerview-v7:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/bcc2e825d05212765022895fc3e669b5/recyclerview-v7-26.1.0/AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:recyclerview-v7:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/bcc2e825d05212765022895fc3e669b5/recyclerview-v7-26.1.0/AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:support-core-ui:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/f4a4de359bb71e3ff551206cdce8ad96/support-core-ui-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-core-ui:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/f4a4de359bb71e3ff551206cdce8ad96/support-core-ui-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-media-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/a31ec6f6fa52cc8fbc645871a11eebc3/support-media-compat-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-media-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/a31ec6f6fa52cc8fbc645871a11eebc3/support-media-compat-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-core-utils:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/9b60b442c18603343137db4eda9b65f6/support-core-utils-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-core-utils:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/9b60b442c18603343137db4eda9b65f6/support-core-utils-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/220c9c180e8e9618ecf7bb8e2f1eddbb/support-compat-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/220c9c180e8e9618ecf7bb8e2f1eddbb/support-compat-26.1.0/AndroidManifest.xml:25:5-29:19
+MERGED from [android.arch.lifecycle:runtime:1.0.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/1f45d69d51a7cd9269ac5863e813b302/runtime-1.0.0/AndroidManifest.xml:24:5-28:19
+MERGED from [android.arch.lifecycle:runtime:1.0.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/1f45d69d51a7cd9269ac5863e813b302/runtime-1.0.0/AndroidManifest.xml:24:5-28:19
+	android:supportsRtl
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:9:9-35
+	android:label
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:8:9-41
+	android:icon
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:7:9-43
+	android:allowBackup
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:6:9-35
+	android:theme
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:10:9-46
+activity#com.google.jimlongja.uniqueid.MainActivity
+ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:11:9-17:20
+	android:name
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:11:19-47
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LEANBACK_LAUNCHER
+ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:12:13-16:29
+action#android.intent.action.MAIN
+ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:13:17-69
+	android:name
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:13:25-66
+category#android.intent.category.LEANBACK_LAUNCHER
+ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:15:17-86
+	android:name
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml:15:27-83
+uses-sdk
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+MERGED from [com.android.support:leanback-v17:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/13e4ef0cea1b5be9543ca375317a7aad/leanback-v17-26.1.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:leanback-v17:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/13e4ef0cea1b5be9543ca375317a7aad/leanback-v17-26.1.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/3510dcad850f5a33674b7ed1ffd01865/support-fragment-26.1.0/AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:support-fragment:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/3510dcad850f5a33674b7ed1ffd01865/support-fragment-26.1.0/AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:recyclerview-v7:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/bcc2e825d05212765022895fc3e669b5/recyclerview-v7-26.1.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/bcc2e825d05212765022895fc3e669b5/recyclerview-v7-26.1.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/f4a4de359bb71e3ff551206cdce8ad96/support-core-ui-26.1.0/AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-core-ui:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/f4a4de359bb71e3ff551206cdce8ad96/support-core-ui-26.1.0/AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-media-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/a31ec6f6fa52cc8fbc645871a11eebc3/support-media-compat-26.1.0/AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-media-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/a31ec6f6fa52cc8fbc645871a11eebc3/support-media-compat-26.1.0/AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-core-utils:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/9b60b442c18603343137db4eda9b65f6/support-core-utils-26.1.0/AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:support-core-utils:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/9b60b442c18603343137db4eda9b65f6/support-core-utils-26.1.0/AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:support-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/220c9c180e8e9618ecf7bb8e2f1eddbb/support-compat-26.1.0/AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/220c9c180e8e9618ecf7bb8e2f1eddbb/support-compat-26.1.0/AndroidManifest.xml:21:5-23:58
+MERGED from [android.arch.lifecycle:runtime:1.0.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/1f45d69d51a7cd9269ac5863e813b302/runtime-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [android.arch.lifecycle:runtime:1.0.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/1f45d69d51a7cd9269ac5863e813b302/runtime-1.0.0/AndroidManifest.xml:20:5-22:41
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+	tools:overrideLibrary
+		ADDED from [com.android.support:support-fragment:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/3510dcad850f5a33674b7ed1ffd01865/support-fragment-26.1.0/AndroidManifest.xml:23:9-57
+	android:targetSdkVersion
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+		ADDED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+		INJECTED from /ssd/Developer/UniqueID/app/src/main/AndroidManifest.xml
+meta-data#android.support.VERSION
+ADDED from [com.android.support:leanback-v17:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/13e4ef0cea1b5be9543ca375317a7aad/leanback-v17-26.1.0/AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:support-fragment:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/3510dcad850f5a33674b7ed1ffd01865/support-fragment-26.1.0/AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-fragment:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/3510dcad850f5a33674b7ed1ffd01865/support-fragment-26.1.0/AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:recyclerview-v7:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/bcc2e825d05212765022895fc3e669b5/recyclerview-v7-26.1.0/AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:recyclerview-v7:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/bcc2e825d05212765022895fc3e669b5/recyclerview-v7-26.1.0/AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:support-core-ui:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/f4a4de359bb71e3ff551206cdce8ad96/support-core-ui-26.1.0/AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-core-ui:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/f4a4de359bb71e3ff551206cdce8ad96/support-core-ui-26.1.0/AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-media-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/a31ec6f6fa52cc8fbc645871a11eebc3/support-media-compat-26.1.0/AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-media-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/a31ec6f6fa52cc8fbc645871a11eebc3/support-media-compat-26.1.0/AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-core-utils:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/9b60b442c18603343137db4eda9b65f6/support-core-utils-26.1.0/AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-core-utils:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/9b60b442c18603343137db4eda9b65f6/support-core-utils-26.1.0/AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/220c9c180e8e9618ecf7bb8e2f1eddbb/support-compat-26.1.0/AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-compat:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/220c9c180e8e9618ecf7bb8e2f1eddbb/support-compat-26.1.0/AndroidManifest.xml:26:9-28:38
+	android:value
+		ADDED from [com.android.support:leanback-v17:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/13e4ef0cea1b5be9543ca375317a7aad/leanback-v17-26.1.0/AndroidManifest.xml:25:13-35
+	android:name
+		ADDED from [com.android.support:leanback-v17:26.1.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/13e4ef0cea1b5be9543ca375317a7aad/leanback-v17-26.1.0/AndroidManifest.xml:24:13-51
+meta-data#android.arch.lifecycle.VERSION
+ADDED from [android.arch.lifecycle:runtime:1.0.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/1f45d69d51a7cd9269ac5863e813b302/runtime-1.0.0/AndroidManifest.xml:25:9-27:47
+	android:value
+		ADDED from [android.arch.lifecycle:runtime:1.0.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/1f45d69d51a7cd9269ac5863e813b302/runtime-1.0.0/AndroidManifest.xml:27:13-44
+	android:name
+		ADDED from [android.arch.lifecycle:runtime:1.0.0] /usr/local/google/home/jimlongja/.gradle/caches/transforms-2/files-2.1/1f45d69d51a7cd9269ac5863e813b302/runtime-1.0.0/AndroidManifest.xml:26:13-58

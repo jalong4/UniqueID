@@ -1,0 +1,36 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.google.jimlongja.uniqueid"
+        minSdkVersion 28
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+    }
+    packagingOptions {
+        exclude 'res/layout/notification_template_part_chronometer.xml'
+        exclude 'resources.arsc'
+        exclude 'AndroidManifest.xml'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.64'
+    implementation 'com.google.guava:guava:28.2-jre'
+    implementation 'com.android.support:leanback-v17:26.1.0'
+    implementation group: 'org.robolectric', name: 'android-all', version: '10-robolectric-5803371'
+}
