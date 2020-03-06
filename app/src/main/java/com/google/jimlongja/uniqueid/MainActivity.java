@@ -117,8 +117,8 @@ public class MainActivity extends Activity {
             // attest_key() at the keymaster2 HAL.
             keyPairGenerator.generateKeyPair();
 
-//            AttestedKeyPair keyPair1 = generateAttestedKeyPair(keyPairGenerator.getAlgorithm(),
-//                    keyGenParameterSpec);
+            AttestedKeyPair keyPair = generateAttestedKeyPair(keyPairGenerator.getAlgorithm(),
+                    keyGenParameterSpec);
 
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
