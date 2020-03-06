@@ -1,16 +1,15 @@
 package com.google.jimlongja.uniqueid;
 
 import android.app.Activity;
-
+import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.security.AttestedKeyPair;
-import android.security.keymaster.KeymasterDefs;
-import android.security.keystore.DeviceIdAttestationException;
+//import android.security.keymaster.KeymasterDefs;
+//import android.security.keystore.DeviceIdAttestationException;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Log;
@@ -78,17 +77,19 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
 
-        Log.i(TAG, String.format("Software ID Attestation Supported: %b", isDeviceIdAttestationSupported(SOFTWARE_DEVICE_ID_ATTESTATION)));
-        Log.i(TAG, String.format("Hardware ID Attestation Supported: %b", isDeviceIdAttestationSupported(HARDWARE_DEVICE_UNIQUE_ATTESTATION)));
+        Log.i(TAG, String.format("Software ID Attestation Supported: %b", hasSystemFeature(SOFTWARE_DEVICE_ID_ATTESTATION)));
+        Log.i(TAG, String.format("Hardware ID Attestation Supported: %b", hasSystemFeature(HARDWARE_DEVICE_UNIQUE_ATTESTATION)));
+        Log.i(TAG, String.format("Verified Boot Supported: %b", hasSystemFeature(PackageManager.FEATURE_VERIFIED_BOOT)));
+        Log.i(TAG, String.format("Device Admin Supported: %b", hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)));
         Log.i(TAG, "ro.product.brand:[" + BRAND + "]");
         Log.i(TAG, "ro.product.device:[" + DEVICE + "]");
         Log.i(TAG, "ro.build.product:[" + PRODUCT + "]");
         Log.i(TAG, "ro.product.manufacturer:[" + MANUFACTURER + "]");
         Log.i(TAG, "ro.product.model:[" + MODEL + "]");
 
-        attestIds();
+//        attestIds();
 
-        Log.i(TAG, certificate != null ? certificate.toString() : "Cert is null");
+        Log.i(TAG, certificate != null ? "\n" + certificate.toString() : "Cert is null");
 
 
         if (certificate instanceof X509Certificate) {
@@ -157,16 +158,16 @@ public class MainActivity extends Activity {
 
         // Generate the key pair. This will result in calls to both generate_key() and
         // attest_key() at the keymaster2 HAL.
-//        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) this.getSystemService(Context.DEVICE_POLICY_SERVICE);
         String keyAlgorithm = keyPairGenerator.getAlgorithm();
-        ComponentName componentName = this.getComponentName();
+        ComponentName componentName = ComponentName.createRelative(this, ".UniqueIDAdminReceiver");
         int idAttestationFlags = DevicePolicyManager.ID_TYPE_BASE_INFO;
-        AttestedKeyPair keyPair =
+        AttestedKeyPair attestedKeyPair =
                 devicePolicyManager.generateKeyPair(
                         componentName, keyAlgorithm, keyGenParameterSpec, idAttestationFlags);
 
-        if (keyPair == null) {
+        if (attestedKeyPair == null) {
             return null;
         }
 
@@ -181,44 +182,25 @@ public class MainActivity extends Activity {
 
     }
 
-    private void attestIds() {
-        try {
-            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_BRAND, BRAND);
-            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_DEVICE, DEVICE);
-            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_PRODUCT, PRODUCT);
-            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_MANUFACTURER, MANUFACTURER);
-            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_MODEL, MODEL);
-        } catch (DeviceIdAttestationException e) {
-            e.printStackTrace();
-        }
-    }
-
-//    private void testAttestedProps(KeyGenParameterSpec keySpec,
-//                                   KeyPairGenerator keyPairGenerator) {
-//        String algorithm = keyPairGenerator.getAlgorithm();
-//        ComponentName componentName = this.getComponentName();
-//        int idAttestationFlags = ID_TYPE_BASE_INFO;
-//
-//
-//        DevicePolicyManager devicePolicyManager =
-//                (DevicePolicyManager) getApplicationContext().getSystemService(
-//                Context.DEVICE_POLICY_SERVICE);
-//
-//
-//        AttestedKeyPair keyPair = devicePolicyManager.generateKeyPair(componentName, algorithm, keySpec, idAttestationFlags);
-//
+//    private void attestIds() {
+//        try {
+//            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_BRAND, BRAND);
+//            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_DEVICE, DEVICE);
+//            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_PRODUCT, PRODUCT);
+//            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_MANUFACTURER, MANUFACTURER);
+//            attestId(KeymasterDefs.KM_TAG_ATTESTATION_ID_MODEL, MODEL);
+//        } catch (DeviceIdAttestationException e) {
+//            e.printStackTrace();
+//        }
 //    }
 
+//    private void attestId(int idType, String expectedValue) throws DeviceIdAttestationException {
+//        AttestationUtils.attestDeviceIds(getApplicationContext(), new int[]{idType}, expectedValue.getBytes());
+//    }
 
-    private void attestId(int idType, String expectedValue) throws DeviceIdAttestationException {
-        AttestationUtils.attestDeviceIds(getApplicationContext(), new int[]{idType}, expectedValue.getBytes());
-    }
-
-
-    public boolean isDeviceIdAttestationSupported(String feature) {
+    public boolean hasSystemFeature(String feature) {
         PackageManager pm = getApplicationContext().getPackageManager();
         return pm.hasSystemFeature(feature);
     }
-
 
 }
