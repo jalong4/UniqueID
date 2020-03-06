@@ -2,11 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file:///ssd/Developer/UniqueID/.ssd.Developer.UniqueID.iml" filepath="/ssd/Developer/UniqueID/.ssd.Developer.UniqueID.iml" group="UniqueID" />
       <module fileurl="file://$PROJECT_DIR$/Developer.UniqueID.iml" filepath="$PROJECT_DIR$/Developer.UniqueID.iml" group="UniqueID" />
+      <module fileurl="file:///ssd/Developer/UniqueID/app/Developer.UniqueID.app.iml" filepath="/ssd/Developer/UniqueID/app/Developer.UniqueID.app.iml" group="UniqueID/app" />
       <module fileurl="file:///ssd/Developer/UniqueID/UniqueID.iml" filepath="/ssd/Developer/UniqueID/UniqueID.iml" group="UniqueID" />
       <module fileurl="file://$PROJECT_DIR$/app/UniqueID.app.iml" filepath="$PROJECT_DIR$/app/UniqueID.app.iml" group="UniqueID/app" />
       <module fileurl="file:///ssd/Developer/UniqueID/app/app.iml" filepath="/ssd/Developer/UniqueID/app/app.iml" group="UniqueID/app" />
       <module fileurl="file://$PROJECT_DIR$/jimlongja.Developer.UniqueID.iml" filepath="$PROJECT_DIR$/jimlongja.Developer.UniqueID.iml" group="UniqueID" />
+      <module fileurl="file:///ssd/Developer/UniqueID/ssd.Developer.UniqueID.iml" filepath="/ssd/Developer/UniqueID/ssd.Developer.UniqueID.iml" group="UniqueID" />
     </modules>
   </component>
 </project>

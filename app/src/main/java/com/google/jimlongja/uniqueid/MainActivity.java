@@ -12,6 +12,7 @@ import android.security.AttestedKeyPair;
 //import android.security.keystore.DeviceIdAttestationException;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.IOException;
@@ -53,44 +54,15 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Certificate certificate = null;
-        try {
-            Log.i(TAG, "calling getAttestationCertificate");
-            certificate = getAttestationCertificate();
-        } catch (NoSuchProviderException e) {
-            Log.e(TAG, "NoSuchProviderException");
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "NoSuchAlgorithmException");
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            Log.e(TAG, "InvalidAlgorithmParameterException");
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            Log.e(TAG, "KeyStoreException");
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            Log.e(TAG, "CertificateException");
-            e.printStackTrace();
-        } catch (IOException e) {
-            Log.e(TAG, "IOException");
-            e.printStackTrace();
+        displayFeaturesAndProperties();
+        Certificate certificate = getAttestationCertificate();
+
+        if (certificate == null ) {
+            Log.i(TAG, "Failed to get Attestation Certificate, exitting...");
+            return;
         }
 
-        Log.i(TAG, String.format("Software ID Attestation Supported: %b", hasSystemFeature(SOFTWARE_DEVICE_ID_ATTESTATION)));
-        Log.i(TAG, String.format("Hardware ID Attestation Supported: %b", hasSystemFeature(HARDWARE_DEVICE_UNIQUE_ATTESTATION)));
-        Log.i(TAG, String.format("Verified Boot Supported: %b", hasSystemFeature(PackageManager.FEATURE_VERIFIED_BOOT)));
-        Log.i(TAG, String.format("Device Admin Supported: %b", hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)));
-        Log.i(TAG, "ro.product.brand:[" + BRAND + "]");
-        Log.i(TAG, "ro.product.device:[" + DEVICE + "]");
-        Log.i(TAG, "ro.build.product:[" + PRODUCT + "]");
-        Log.i(TAG, "ro.product.manufacturer:[" + MANUFACTURER + "]");
-        Log.i(TAG, "ro.product.model:[" + MODEL + "]");
-
-//        attestIds();
-
         Log.i(TAG, certificate != null ? "\n" + certificate.toString() : "Cert is null");
-
 
         if (certificate instanceof X509Certificate) {
             X509Certificate x509cert = (X509Certificate) certificate;
@@ -116,9 +88,64 @@ public class MainActivity extends Activity {
         Log.i(TAG, "done");
     }
 
-    private Certificate getAttestationCertificate() throws
-            NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
-            KeyStoreException, CertificateException, IOException {
+    private void displayFeaturesAndProperties() {
+        Log.i(TAG, String.format("Software ID Attestation Supported: %b", hasSystemFeature(SOFTWARE_DEVICE_ID_ATTESTATION)));
+        Log.i(TAG, String.format("Hardware ID Attestation Supported: %b", hasSystemFeature(HARDWARE_DEVICE_UNIQUE_ATTESTATION)));
+        Log.i(TAG, String.format("Verified Boot Supported: %b", hasSystemFeature(PackageManager.FEATURE_VERIFIED_BOOT)));
+        Log.i(TAG, String.format("Device Admin Supported: %b", hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)));
+        Log.i(TAG, "ro.product.brand:[" + BRAND + "]");
+        Log.i(TAG, "ro.product.device:[" + DEVICE + "]");
+        Log.i(TAG, "ro.build.product:[" + PRODUCT + "]");
+        Log.i(TAG, "ro.product.manufacturer:[" + MANUFACTURER + "]");
+        Log.i(TAG, "ro.product.model:[" + MODEL + "]");
+    }
+
+    private Certificate getAttestationCertificate() {
+
+        // Create KeyPairGenerator and set generation parameters for an ECDSA key pair
+        // using the NIST P-256 curve.
+
+
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
+                    KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
+
+            KeyGenParameterSpec keyGenParameterSpec = buildKeyGenParameterSpec();
+            keyPairGenerator.initialize(keyGenParameterSpec);
+
+            // Generate the key pair. This will result in calls to both generate_key() and
+            // attest_key() at the keymaster2 HAL.
+            keyPairGenerator.generateKeyPair();
+
+//            AttestedKeyPair keyPair1 = generateAttestedKeyPair(keyPairGenerator.getAlgorithm(),
+//                    keyGenParameterSpec);
+
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+
+
+            Certificate[] certificates = keyStore.getCertificateChain(KEYSTORE_ALIAS);
+            return certificates[0];
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    private KeyGenParameterSpec buildKeyGenParameterSpec() {
 
         String challenge = "test";
         Date KeyValidityStart = new Date();
@@ -127,13 +154,7 @@ public class MainActivity extends Activity {
         Date KeyValidyForComsumptionnEnd =
                 new Date(KeyValidityStart.getTime() + CONSUMPTION_TIME_OFFSET);
 
-        // Create KeyPairGenerator and set generation parameters for an ECDSA key pair
-        // using the NIST P-256 curve.
-
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
-                KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
-
-        KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(KEYSTORE_ALIAS, KeyProperties.PURPOSE_SIGN)
+        return new KeyGenParameterSpec.Builder(KEYSTORE_ALIAS, KeyProperties.PURPOSE_SIGN)
                 .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                 .setDigests(KeyProperties.DIGEST_SHA256,
                         KeyProperties.DIGEST_SHA384,
@@ -144,7 +165,6 @@ public class MainActivity extends Activity {
                 .setUserAuthenticationRequired(false)
                 // .setUserAuthenticationValidityDurationSeconds(5 * 60)
 
-
                 // Request an attestation with challenge
                 .setAttestationChallenge(challenge.getBytes())
 
@@ -153,33 +173,19 @@ public class MainActivity extends Activity {
                 .setKeyValidityForConsumptionEnd(KeyValidyForComsumptionnEnd)
 
                 .build();
+    }
 
-        keyPairGenerator.initialize(keyGenParameterSpec);
+    private AttestedKeyPair generateAttestedKeyPair(@NonNull String keyAlgorithm,
+                                                    @NonNull KeyGenParameterSpec keySpec) {
 
-        // Generate the key pair. This will result in calls to both generate_key() and
-        // attest_key() at the keymaster2 HAL.
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) this.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        String keyAlgorithm = keyPairGenerator.getAlgorithm();
-        ComponentName componentName = ComponentName.createRelative(this, ".UniqueIDAdminReceiver");
-        int idAttestationFlags = DevicePolicyManager.ID_TYPE_BASE_INFO;
-        AttestedKeyPair attestedKeyPair =
-                devicePolicyManager.generateKeyPair(
-                        componentName, keyAlgorithm, keyGenParameterSpec, idAttestationFlags);
+        DevicePolicyManager devicePolicyManager =
+                (DevicePolicyManager) this.getSystemService(Context.DEVICE_POLICY_SERVICE);
 
-        if (attestedKeyPair == null) {
-            return null;
-        }
+        ComponentName componentName =
+                ComponentName.createRelative(this, ".UniqueIDAdminReceiver");
 
-        // Get the certificate chain
-        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-        keyStore.load(null);
-        Certificate[] certificates = keyStore.getCertificateChain(KEYSTORE_ALIAS);
-
-        // certs[0] is the attestation certificate. certs[1] signs certs[0], etc.,
-        // up to certs[certs.length - 1].
-        return certificates[0];
-
+        return devicePolicyManager.generateKeyPair(componentName, keyAlgorithm, keySpec,
+                DevicePolicyManager.ID_TYPE_BASE_INFO);
     }
 
 //    private void attestIds() {
