@@ -10,6 +10,8 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Log;
 
+import com.google.common.io.BaseEncoding;
+
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -61,7 +63,9 @@ public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, X509Certifica
                     DevicePolicyManager.ID_TYPE_BASE_INFO);
 
             List<Certificate> certificates = keyPair.getAttestationRecord();
-            if ((certificates == null) || (certificates.get(0) == null)) {
+
+            // getAttestationRecord() value will never be null.
+            if (certificates.get(0) == null) {
                 return null;
             }
             Certificate certificate = certificates.get(0);
@@ -94,8 +98,22 @@ public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, X509Certifica
         }
 
         try {
-            Attestation assestation = new Attestation(x509cert);
-            Log.i(TAG, assestation.toString());
+            Attestation attestation = new Attestation(x509cert);
+//            Log.i(TAG, attestation.toString());
+            AuthorizationList teeEnforced = attestation.getTeeEnforced();
+            Log.i(TAG," ");
+            Log.i(TAG, "TEE enforced attested brand:[" + teeEnforced.getBrand() + "]");
+            Log.i(TAG, "TEE enforced attested device:[" + teeEnforced.getDevice() + "]");
+            Log.i(TAG, "TEE enforced attested product:[" + teeEnforced.getProduct() + "]");
+            Log.i(TAG, "TEE enforced attested manufacturer:[" + teeEnforced.getManufacturer() + "]");
+            Log.i(TAG, "TEE enforced attested model:[" + teeEnforced.getModel() + "]");
+            Log.i(TAG," ");
+            Log.i(TAG,"Root of Trust: ");
+            Log.i(TAG,"Verified boot Key: " + BaseEncoding.base64().encode(teeEnforced.getRootOfTrust().getVerifiedBootKey()));
+            Log.i(TAG,String.format("Device locked: %b", teeEnforced.getRootOfTrust().isDeviceLocked()));
+            String verifiedBootState = teeEnforced.getRootOfTrust().verifiedBootStateToString(teeEnforced.getRootOfTrust().getVerifiedBootState());
+            Log.i(TAG,"Verified boot state: " + verifiedBootState);
+
         } catch (CertificateParsingException e) {
             e.printStackTrace();
         }

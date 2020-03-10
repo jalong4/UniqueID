@@ -2,18 +2,10 @@ package com.google.jimlongja.uniqueid;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-//import android.security.keymaster.KeymasterDefs;
-//import android.security.keystore.DeviceIdAttestationException;
 import android.util.Log;
-
-import java.security.cert.Certificate;
-import java.security.cert.CertificateParsingException;
-import java.security.cert.X509Certificate;
-import java.util.concurrent.ExecutionException;
 
 import static android.os.Build.BRAND;
 import static android.os.Build.DEVICE;
@@ -46,6 +38,8 @@ public class MainActivity extends Activity {
         Log.i(TAG, String.format("Hardware ID Attestation Supported: %b", hasSystemFeature(HARDWARE_DEVICE_UNIQUE_ATTESTATION)));
         Log.i(TAG, String.format("Verified Boot Supported: %b", hasSystemFeature(PackageManager.FEATURE_VERIFIED_BOOT)));
         Log.i(TAG, String.format("Device Admin Supported: %b", hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)));
+        Log.i(TAG, String.format("Device Id Attestation Supported: %b", isDeviceIdAttestationSupported()));
+        Log.i(TAG," ");
         Log.i(TAG, "ro.product.brand:[" + BRAND + "]");
         Log.i(TAG, "ro.product.device:[" + DEVICE + "]");
         Log.i(TAG, "ro.build.product:[" + PRODUCT + "]");
@@ -56,6 +50,12 @@ public class MainActivity extends Activity {
     private boolean hasSystemFeature(String feature) {
         PackageManager pm = getApplication().getPackageManager();
         return pm.hasSystemFeature(feature);
+    }
+
+    private boolean isDeviceIdAttestationSupported() {
+        DevicePolicyManager dpm =
+                (DevicePolicyManager) getApplication().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return dpm.isDeviceIdAttestationSupported();
     }
 
 }
