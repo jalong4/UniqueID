@@ -32,7 +32,6 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1SequenceParser;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.ASN1InputStream;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -726,6 +725,18 @@ public class AuthorizationList {
         if (device != null) {
             s.append("\nDevice type: ").append(device);
         }
+
+        if (product != null) {
+            s.append("\nProduct: ").append(product);
+        }
+        if (manufacturer != null) {
+            s.append("\nManufacturer: ").append(manufacturer);
+        }
+
+        if (model != null) {
+            s.append("\nModel: ").append(model);
+        }
+
         return s.toString();
     }
 }

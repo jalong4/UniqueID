@@ -16,7 +16,6 @@
 
 package com.google.jimlongja.uniqueid;
 
-import android.support.annotation.NonNull;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableSet;
@@ -26,10 +25,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Parses an attestation certificate and provides an easy-to-use interface for examining the
