@@ -21,6 +21,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static android.os.Build.BRAND;
 import static android.os.Build.DEVICE;
@@ -28,26 +29,21 @@ import static android.os.Build.MANUFACTURER;
 import static android.os.Build.MODEL;
 import static android.os.Build.PRODUCT;
 
-public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, Certificate> {
+public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, X509Certificate> {
 
-    public static final String HARDWARE_DEVICE_UNIQUE_ATTESTATION =
-            "android.hardware.device_unique_attestation";
-    private static final String SOFTWARE_DEVICE_ID_ATTESTATION =
-            "android.software.device_id_attestation";
     private static final int ID_TYPE_BASE_INFO = 1;
     private static final int ORIGINATION_TIME_OFFSET = 1000000;
     private static final int CONSUMPTION_TIME_OFFSET = 2000000;
     private static final String KEYSTORE_ALIAS = "test_key";
     private static final String TAG = "UniqueIDAsyncTask";
-    private PackageManager mPackageManager;
 
     @Override
-    protected Certificate doInBackground(Context... contexts) {
+    protected X509Certificate doInBackground(Context... contexts) {
         if (contexts.length != 1) {
             return null;
         }
         Context ctx = contexts[0];
-        mPackageManager = ctx.getPackageManager();
+
         DevicePolicyManager devicePolicyManager =
                 (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
         ComponentName componentName = ComponentName.createRelative(ctx, ".UniqueIDAdminReceiver");
@@ -65,44 +61,44 @@ public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, Certificate> 
                     DevicePolicyManager.ID_TYPE_BASE_INFO);
 
             List<Certificate> certificates = keyPair.getAttestationRecord();
-            return certificates.get(0);
+            if ((certificates == null) || (certificates.get(0) == null)) {
+                return null;
+            }
+            Certificate certificate = certificates.get(0);
+            if (!(certificate instanceof X509Certificate)) {
+                return null;
+            }
+
+            X509Certificate x509cert = (X509Certificate) certificate;
+            x509cert.checkValidity();
+            return x509cert;
 
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
-        } catch (Exception e) {
+        } catch (CertificateNotYetValidException e) {
+            e.printStackTrace();
+        } catch (CertificateExpiredException e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    protected void onPostExecute(Certificate certificate) {
-        displayFeaturesAndProperties();
+    protected void onPostExecute(X509Certificate x509cert) {
 
-
-        if (certificate == null ) {
-            Log.i(TAG, "Failed to get Attestation Certificate");
+        if (x509cert == null) {
+            Log.e(TAG, "Failed to get x509 cert");
             return;
         }
 
-        if (certificate instanceof X509Certificate) {
-            X509Certificate x509cert = (X509Certificate) certificate;
-            try {
-                x509cert.checkValidity();
-                Attestation assestation = new Attestation(x509cert);
-                Log.i(TAG, assestation.toString());
-
-            } catch (CertificateParsingException e) {
-                e.printStackTrace();
-            } catch (CertificateExpiredException e) {
-                e.printStackTrace();
-            } catch (CertificateNotYetValidException e) {
-                e.printStackTrace();
-            }
+        try {
+            Attestation assestation = new Attestation(x509cert);
+            Log.i(TAG, assestation.toString());
+        } catch (CertificateParsingException e) {
+            e.printStackTrace();
         }
-
     }
 
     private KeyGenParameterSpec buildKeyGenParameterSpec() {
@@ -133,22 +129,5 @@ public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, Certificate> 
                 .setKeyValidityForConsumptionEnd(KeyValidyForComsumptionnEnd)
 
                 .build();
-    }
-
-    private void displayFeaturesAndProperties() {
-        Log.i(TAG, String.format("Software ID Attestation Supported: %b", hasSystemFeature(SOFTWARE_DEVICE_ID_ATTESTATION)));
-        Log.i(TAG, String.format("Hardware ID Attestation Supported: %b", hasSystemFeature(HARDWARE_DEVICE_UNIQUE_ATTESTATION)));
-        Log.i(TAG, String.format("Verified Boot Supported: %b", hasSystemFeature(PackageManager.FEATURE_VERIFIED_BOOT)));
-        Log.i(TAG, String.format("Device Admin Supported: %b", hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)));
-        Log.i(TAG, "ro.product.brand:[" + BRAND + "]");
-        Log.i(TAG, "ro.product.device:[" + DEVICE + "]");
-        Log.i(TAG, "ro.build.product:[" + PRODUCT + "]");
-        Log.i(TAG, "ro.product.manufacturer:[" + MANUFACTURER + "]");
-        Log.i(TAG, "ro.product.model:[" + MODEL + "]");
-    }
-
-
-    public boolean hasSystemFeature(String feature) {
-        return mPackageManager.hasSystemFeature(feature);
     }
 }

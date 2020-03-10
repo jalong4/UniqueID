@@ -203,6 +203,9 @@ public class AuthorizationList {
     private boolean confirmationRequired;
 
     public AuthorizationList(ASN1Encodable sequence) throws CertificateParsingException {
+        this(sequence, false);
+    }
+    public AuthorizationList(ASN1Encodable sequence, Boolean logParsedTags) throws CertificateParsingException {
         if (!(sequence instanceof ASN1Sequence)) {
             throw new CertificateParsingException("Expected sequence for authorization list, found "
                     + sequence.getClass().getName());
@@ -213,7 +216,9 @@ public class AuthorizationList {
         for (; entry != null; entry = parseAsn1TaggedObject(parser)) {
             int tag = entry.getTagNo();
             ASN1Primitive value = entry.getObject();
-            Log.i("Attestation", "Parsing tag: [" + tag + "], value: [" + value + "]");
+            if (logParsedTags) {
+                Log.i("Attestation", "Parsing tag: [" + tag + "], value: [" + value + "]");
+            }
             switch (tag) {
                 default:
                     throw new CertificateParsingException("Unknown tag " + tag + " found");
@@ -226,7 +231,9 @@ public class AuthorizationList {
                     break;
                 case KM_TAG_KEY_SIZE & KEYMASTER_TAG_TYPE_MASK:
                     keySize = Asn1Utils.getIntegerFromAsn1(value);
-                    Log.i("Attestation", "Found KEY SIZE, value: " + keySize);
+                    if (logParsedTags) {
+                        Log.i("Attestation", "Found KEY SIZE, value: " + keySize);
+                    }
                     break;
                 case KM_TAG_DIGEST & KEYMASTER_TAG_TYPE_MASK:
                     digests = Asn1Utils.getIntegersFromAsn1Set(value);
