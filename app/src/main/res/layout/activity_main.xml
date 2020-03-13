@@ -15,4 +15,14 @@
         android:textColor="#fff"
         />
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Unique ID Test app"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center_vertical"
+        android:gravity="center"
+        android:textColor="#fff"
+        />
+
 </RelativeLayout>

@@ -28,9 +28,12 @@ public class MainActivity extends Activity {
 
         displayFeaturesAndProperties();
 
-        UniqueIDAsyncTask asyncTask = new UniqueIDAsyncTask();
-        asyncTask.execute(getApplicationContext());
+        // In order to use the devicepolicymanager issue the following adb command on the device:
+        // adb shell dpm set-device-owner com.google.jimlongja.uniqueid/.UniqueIDAdminReceiver
 
+        new UniqueIDAsyncTask().execute(new UniqueIDAsyncTaskParams(
+                getApplicationContext(),
+                hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)));
     }
 
     private void displayFeaturesAndProperties() {

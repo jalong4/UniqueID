@@ -3,7 +3,6 @@ package com.google.jimlongja.uniqueid;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.security.AttestedKeyPair;
 import android.security.keystore.KeyGenParameterSpec;
@@ -12,17 +11,25 @@ import android.util.Log;
 
 import com.google.common.io.BaseEncoding;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import static android.os.Build.BRAND;
@@ -31,7 +38,7 @@ import static android.os.Build.MANUFACTURER;
 import static android.os.Build.MODEL;
 import static android.os.Build.PRODUCT;
 
-public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, X509Certificate> {
+public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Integer, X509Certificate> {
 
     private static final int ID_TYPE_BASE_INFO = 1;
     private static final int ORIGINATION_TIME_OFFSET = 1000000;
@@ -40,15 +47,12 @@ public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, X509Certifica
     private static final String TAG = "UniqueIDAsyncTask";
 
     @Override
-    protected X509Certificate doInBackground(Context... contexts) {
-        if (contexts.length != 1) {
+    protected X509Certificate doInBackground(UniqueIDAsyncTaskParams... params) {
+        if (params.length != 1) {
             return null;
         }
-        Context ctx = contexts[0];
-
-        DevicePolicyManager devicePolicyManager =
-                (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        ComponentName componentName = ComponentName.createRelative(ctx, ".UniqueIDAdminReceiver");
+        Context context = params[0].context;
+        Boolean fromDevicePolicyManager = params[0].fromDevicePolicyManager;
 
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
@@ -56,15 +60,14 @@ public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, X509Certifica
 
             KeyGenParameterSpec keyGenParameterSpec = buildKeyGenParameterSpec();
 
+            String from = fromDevicePolicyManager ? "Device Policy Manager" : "KeyStore";
+            Log.i(TAG, "Generating keypair using: " + from);
 
-            AttestedKeyPair keyPair = devicePolicyManager.generateKeyPair(componentName,
-                    keyPairGenerator.getAlgorithm(),
-                    keyGenParameterSpec,
-                    DevicePolicyManager.ID_TYPE_BASE_INFO);
+            List<Certificate> certificates = fromDevicePolicyManager ?
+                    getCertificateChainFromDevicePolicyManager(context, keyPairGenerator, keyGenParameterSpec) :
+                    getCertificateChainFromKeyStore(keyPairGenerator, keyGenParameterSpec);
 
-            List<Certificate> certificates = keyPair.getAttestationRecord();
 
-            // getAttestationRecord() value will never be null.
             if (certificates.get(0) == null) {
                 return null;
             }
@@ -85,9 +88,46 @@ public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, X509Certifica
             e.printStackTrace();
         } catch (CertificateExpiredException e) {
             e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
         }
 
         return null;
+    }
+
+    private List<Certificate> getCertificateChainFromDevicePolicyManager(
+            Context context,
+            KeyPairGenerator keyPairGenerator,
+            KeyGenParameterSpec keyGenParameterSpec) {
+
+        DevicePolicyManager devicePolicyManager =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        ComponentName componentName = ComponentName.createRelative(context, ".UniqueIDAdminReceiver");
+
+        AttestedKeyPair keyPair = devicePolicyManager.generateKeyPair(componentName,
+                keyPairGenerator.getAlgorithm(),
+                keyGenParameterSpec,
+                DevicePolicyManager.ID_TYPE_BASE_INFO);
+
+        return keyPair.getAttestationRecord();
+    }
+
+    private List<Certificate> getCertificateChainFromKeyStore(
+            KeyPairGenerator keyPairGenerator,
+            KeyGenParameterSpec keyGenParameterSpec) throws InvalidAlgorithmParameterException, KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+
+        keyPairGenerator.initialize(keyGenParameterSpec);
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+        List<Certificate> certificates = Arrays.asList(keyStore.getCertificateChain(KEYSTORE_ALIAS));
+        return certificates;
     }
 
     protected void onPostExecute(X509Certificate x509cert) {
@@ -113,6 +153,8 @@ public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, X509Certifica
             Log.i(TAG,String.format("Device locked: %b", teeEnforced.getRootOfTrust().isDeviceLocked()));
             String verifiedBootState = teeEnforced.getRootOfTrust().verifiedBootStateToString(teeEnforced.getRootOfTrust().getVerifiedBootState());
             Log.i(TAG,"Verified boot state: " + verifiedBootState);
+            Log.i(TAG,String.format("Challenge: %s", new String(attestation.getAttestationChallenge())));
+            Log.i(TAG,String.format("Challenge Length: %d", attestation.getAttestationChallenge().length));
 
         } catch (CertificateParsingException e) {
             e.printStackTrace();
@@ -121,7 +163,7 @@ public class UniqueIDAsyncTask extends AsyncTask<Context, Integer, X509Certifica
 
     private KeyGenParameterSpec buildKeyGenParameterSpec() {
 
-        String challenge = "test";
+        String challenge = "1JgY5jUTKIfCpK2IEdPVuBDE0ziqjQ8NPu3VLxscxCAhcjbCdcWn5H4VNi31po8U1JgY5jUTKIfCpK2IEdPVuBDE0ziqjQ8NPu3VLxscxCAhcjbCdcWn5H4VNi31po8U";
         Date KeyValidityStart = new Date();
         Date KeyValidyForOriginationEnd =
                 new Date(KeyValidityStart.getTime() + ORIGINATION_TIME_OFFSET);
