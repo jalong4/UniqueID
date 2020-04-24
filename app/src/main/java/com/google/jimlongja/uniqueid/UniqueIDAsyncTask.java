@@ -29,14 +29,6 @@ import java.security.spec.ECGenParameterSpec;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-
-import static android.os.Build.BRAND;
-import static android.os.Build.DEVICE;
-import static android.os.Build.MANUFACTURER;
-import static android.os.Build.MODEL;
-import static android.os.Build.PRODUCT;
 
 public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Integer, X509Certificate> {
 
@@ -45,6 +37,7 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
     private static final int CONSUMPTION_TIME_OFFSET = 2000000;
     private static final String KEYSTORE_ALIAS = "test_key";
     private static final String TAG = "UniqueIDAsyncTask";
+    private UniqueIDAsyncTaskInterface mCallback;
 
     @Override
     protected X509Certificate doInBackground(UniqueIDAsyncTaskParams... params) {
@@ -53,22 +46,27 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
         }
         Context context = params[0].context;
         Boolean fromDevicePolicyManager = params[0].fromDevicePolicyManager;
+        mCallback = params[0].callback;
+        String challenge = params[0].challenge;
 
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
                     KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
 
-            KeyGenParameterSpec keyGenParameterSpec = buildKeyGenParameterSpec();
+            KeyGenParameterSpec keyGenParameterSpec = buildKeyGenParameterSpec(challenge);
 
-            String from = fromDevicePolicyManager ? "Device Policy Manager" : "KeyStore";
-            Log.i(TAG, "Generating keypair using: " + from);
+//            boolean isAttestToDeviceProperties = (boolean) ReflectionUtil.invoke(keyGenParameterSpec, "isAttestToDeviceProperties");
+//            Log.i(TAG, "isAttestToDeviceProperties: " + (isAttestToDeviceProperties ? "true" : "false"));
+
+            Log.i(TAG, "Generating keypair using: " +
+                    (fromDevicePolicyManager ? "Device Policy Manager" : "KeyStore"));
 
             List<Certificate> certificates = fromDevicePolicyManager ?
-                    getCertificateChainFromDevicePolicyManager(context, keyPairGenerator, keyGenParameterSpec) :
+                    getCertificateChainFromDevicePolicyManager(context, keyPairGenerator,keyGenParameterSpec) :
                     getCertificateChainFromKeyStore(keyPairGenerator, keyGenParameterSpec);
 
 
-            if (certificates.get(0) == null) {
+            if (certificates == null || certificates.get(0) == null) {
                 return null;
             }
             Certificate certificate = certificates.get(0);
@@ -80,21 +78,8 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
             x509cert.checkValidity();
             return x509cert;
 
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (CertificateNotYetValidException e) {
-            e.printStackTrace();
-        } catch (CertificateExpiredException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | KeyStoreException |
+                IOException | NoSuchProviderException | CertificateException e) {
             e.printStackTrace();
         }
 
@@ -115,7 +100,7 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
                 keyGenParameterSpec,
                 DevicePolicyManager.ID_TYPE_BASE_INFO);
 
-        return keyPair.getAttestationRecord();
+        return keyPair == null ? null : keyPair.getAttestationRecord();
     }
 
     private List<Certificate> getCertificateChainFromKeyStore(
@@ -126,51 +111,22 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
         keyStore.load(null);
-        List<Certificate> certificates = Arrays.asList(keyStore.getCertificateChain(KEYSTORE_ALIAS));
-        return certificates;
+        return Arrays.asList(keyStore.getCertificateChain(KEYSTORE_ALIAS));
     }
 
     protected void onPostExecute(X509Certificate x509cert) {
-
-        if (x509cert == null) {
-            Log.e(TAG, "Failed to get x509 cert");
-            return;
-        }
-
-        try {
-            Attestation attestation = new Attestation(x509cert);
-//            Log.i(TAG, attestation.toString());
-            AuthorizationList teeEnforced = attestation.getTeeEnforced();
-            Log.i(TAG," ");
-            Log.i(TAG, "TEE enforced attested brand:[" + teeEnforced.getBrand() + "]");
-            Log.i(TAG, "TEE enforced attested device:[" + teeEnforced.getDevice() + "]");
-            Log.i(TAG, "TEE enforced attested product:[" + teeEnforced.getProduct() + "]");
-            Log.i(TAG, "TEE enforced attested manufacturer:[" + teeEnforced.getManufacturer() + "]");
-            Log.i(TAG, "TEE enforced attested model:[" + teeEnforced.getModel() + "]");
-            Log.i(TAG," ");
-            Log.i(TAG,"Root of Trust: ");
-            Log.i(TAG,"Verified boot Key: " + BaseEncoding.base64().encode(teeEnforced.getRootOfTrust().getVerifiedBootKey()));
-            Log.i(TAG,String.format("Device locked: %b", teeEnforced.getRootOfTrust().isDeviceLocked()));
-            String verifiedBootState = teeEnforced.getRootOfTrust().verifiedBootStateToString(teeEnforced.getRootOfTrust().getVerifiedBootState());
-            Log.i(TAG,"Verified boot state: " + verifiedBootState);
-            Log.i(TAG,String.format("Challenge: %s", new String(attestation.getAttestationChallenge())));
-            Log.i(TAG,String.format("Challenge Length: %d", attestation.getAttestationChallenge().length));
-
-        } catch (CertificateParsingException e) {
-            e.printStackTrace();
-        }
+        mCallback.onComplete(x509cert);
     }
 
-    private KeyGenParameterSpec buildKeyGenParameterSpec() {
+    private KeyGenParameterSpec buildKeyGenParameterSpec(String challenge) {
 
-        String challenge = "1JgY5jUTKIfCpK2IEdPVuBDE0ziqjQ8NPu3VLxscxCAhcjbCdcWn5H4VNi31po8U1JgY5jUTKIfCpK2IEdPVuBDE0ziqjQ8NPu3VLxscxCAhcjbCdcWn5H4VNi31po8U";
         Date KeyValidityStart = new Date();
         Date KeyValidyForOriginationEnd =
                 new Date(KeyValidityStart.getTime() + ORIGINATION_TIME_OFFSET);
         Date KeyValidyForComsumptionnEnd =
                 new Date(KeyValidityStart.getTime() + CONSUMPTION_TIME_OFFSET);
 
-        return new KeyGenParameterSpec.Builder(KEYSTORE_ALIAS, KeyProperties.PURPOSE_SIGN)
+        KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(KEYSTORE_ALIAS, KeyProperties.PURPOSE_SIGN)
                 .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                 .setDigests(KeyProperties.DIGEST_SHA256,
                         KeyProperties.DIGEST_SHA384,
@@ -184,10 +140,23 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
                 // Request an attestation with challenge
                 .setAttestationChallenge(challenge.getBytes())
 
+//                .setAttestToDeviceProperties(true)
+
                 .setKeyValidityStart(KeyValidityStart)
                 .setKeyValidityForOriginationEnd(KeyValidyForOriginationEnd)
-                .setKeyValidityForConsumptionEnd(KeyValidyForComsumptionnEnd)
+                .setKeyValidityForConsumptionEnd(KeyValidyForComsumptionnEnd);
 
-                .build();
+        // Use reflection until new API signitures get update in the Android SDK
+        // Print exception and continue if method is not present
+        try {
+            ReflectionUtil.invoke(builder, "setAttestToDeviceProperties", new Class<?>[]{boolean.class}, false);
+            Log.i(TAG, "setAttestToDeviceProperties:  Supported");
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Log.i(TAG, "setAttestToDeviceProperties:  Not supported");
+        }
+
+        return builder.build();
+
+
     }
 }

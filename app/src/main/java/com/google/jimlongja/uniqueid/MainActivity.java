@@ -7,6 +7,11 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.common.io.BaseEncoding;
+
+import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
+
 import static android.os.Build.BRAND;
 import static android.os.Build.DEVICE;
 import static android.os.Build.MANUFACTURER;
@@ -31,9 +36,14 @@ public class MainActivity extends Activity {
         // In order to use the devicepolicymanager issue the following adb command on the device:
         // adb shell dpm set-device-owner com.google.jimlongja.uniqueid/.UniqueIDAdminReceiver
 
+        String challenge = "1JgY5jUTKIfCpK2IEdPVuBDE0ziqjQ8NPu3VLxscxCAhcjbCdcWn5H4VNi31po8U1JgY5jUTKIfCpK2IEdPVuBDE0ziqjQ8NPu3VLxscxCAhcjbCdcWn5H4VNi31po8U";
+
         new UniqueIDAsyncTask().execute(new UniqueIDAsyncTaskParams(
                 getApplicationContext(),
-                hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)));
+               false,
+                challenge,
+                this::updateUIandLogOutput
+        ));
     }
 
     private void displayFeaturesAndProperties() {
@@ -48,6 +58,40 @@ public class MainActivity extends Activity {
         Log.i(TAG, "ro.build.product:[" + PRODUCT + "]");
         Log.i(TAG, "ro.product.manufacturer:[" + MANUFACTURER + "]");
         Log.i(TAG, "ro.product.model:[" + MODEL + "]");
+    }
+
+    private void updateUIandLogOutput(X509Certificate x509cert) {
+        if (x509cert == null) {
+            Log.e(TAG, "Failed to get x509 cert");
+            return;
+        }
+
+        try {
+            Attestation attestation = new Attestation(x509cert);
+//            Log.i(TAG, attestation.toString());
+            AuthorizationList teeEnforced = attestation.getTeeEnforced();
+            Log.i(TAG, " ");
+            Log.i(TAG, "TEE enforced attested brand:[" + teeEnforced.getBrand() + "]");
+            Log.i(TAG, "TEE enforced attested device:[" + teeEnforced.getDevice() + "]");
+            Log.i(TAG, "TEE enforced attested product:[" + teeEnforced.getProduct() + "]");
+            Log.i(TAG, "TEE enforced attested manufacturer:[" + teeEnforced.getManufacturer() + "]");
+            Log.i(TAG, "TEE enforced attested model:[" + teeEnforced.getModel() + "]");
+            Log.i(TAG, " ");
+
+            if (teeEnforced.getRootOfTrust() != null) {
+                Log.i(TAG, "Root of Trust: ");
+                Log.i(TAG, "Verified boot Key: " + BaseEncoding.base64().encode(teeEnforced.getRootOfTrust().getVerifiedBootKey()));
+                Log.i(TAG, String.format("Device locked: %b", teeEnforced.getRootOfTrust().isDeviceLocked()));
+                String verifiedBootState = RootOfTrust.verifiedBootStateToString(teeEnforced.getRootOfTrust().getVerifiedBootState());
+                Log.i(TAG, "Verified boot state: " + verifiedBootState);
+            }
+
+            Log.i(TAG, String.format("Challenge: %s", new String(attestation.getAttestationChallenge())));
+            Log.i(TAG, String.format("Challenge Length: %d", attestation.getAttestationChallenge().length));
+
+        } catch (CertificateParsingException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean hasSystemFeature(String feature) {
