@@ -19,7 +19,7 @@ class ReflectionUtil {
      *                   {@link #invoke(Object, String, Class[], Object[])}.
      * @return           The result of the invocation. {@code null} if {@code void}.
      */
-    private static Object invoke(Object obj, String methodName, Object... args)
+    static Object invoke(Object obj, String methodName, Object... args)
             throws ReflectionIsTemporaryException {
         return invoke(obj.getClass(), obj, methodName, args);
     }

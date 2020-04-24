@@ -55,8 +55,12 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
 
             KeyGenParameterSpec keyGenParameterSpec = buildKeyGenParameterSpec(challenge);
 
-//            boolean isAttestToDeviceProperties = (boolean) ReflectionUtil.invoke(keyGenParameterSpec, "isAttestToDeviceProperties");
-//            Log.i(TAG, "isAttestToDeviceProperties: " + (isAttestToDeviceProperties ? "true" : "false"));
+            try {
+                boolean isAttestToDeviceProperties = (boolean) ReflectionUtil.invoke(keyGenParameterSpec, "isAttestToDeviceProperties");
+                Log.i(TAG, "isAttestToDeviceProperties: " + (isAttestToDeviceProperties ? "true" : "false"));
+            } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+                Log.i(TAG, "isAttestToDeviceProperties:  Not supported");
+            }
 
             Log.i(TAG, "Generating keypair using: " +
                     (fromDevicePolicyManager ? "Device Policy Manager" : "KeyStore"));
