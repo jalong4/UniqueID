@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.google.jimlongja.uniqueid"
         minSdkVersion 28
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
     }
@@ -31,6 +31,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
     implementation 'org.bouncycastle:bcprov-jdk15on:1.64'
     implementation 'com.google.guava:guava:28.2-jre'
+    //noinspection GradleCompatible
     implementation 'com.android.support:leanback-v17:28.0.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
 //    implementation group: 'org.robolectric', name: 'android-all', version: '10-robolectric-5803371'
 }

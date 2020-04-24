@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.common.io.BaseEncoding;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import static android.os.Build.BRAND;
 import static android.os.Build.DEVICE;
@@ -25,6 +28,8 @@ public class MainActivity extends Activity {
     private static final String SOFTWARE_DEVICE_ID_ATTESTATION =
             "android.software.device_id_attestation";
     private static final String TAG = "UniqueID";
+    private static final long ONE_MINUTE_IN_MILLIS=60000;//millisecs
+    private Challenge mChallenge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +41,18 @@ public class MainActivity extends Activity {
         // In order to use the devicepolicymanager issue the following adb command on the device:
         // adb shell dpm set-device-owner com.google.jimlongja.uniqueid/.UniqueIDAdminReceiver
 
-        String challenge = "1JgY5jUTKIfCpK2IEdPVuBDE0ziqjQ8NPu3VLxscxCAhcjbCdcWn5H4VNi31po8U1JgY5jUTKIfCpK2IEdPVuBDE0ziqjQ8NPu3VLxscxCAhcjbCdcWn5H4VNi31po8U";
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        long expiryEpoc = new Date().toInstant().toEpochMilli() + ONE_MINUTE_IN_MILLIS * 15;
+        mChallenge = new Challenge(
+                new Nonce("MDEyMzQ1Njc4OUFCQ0RFRg==", expiryEpoc),
+                "MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY=");
+
+        Log.i(TAG,"Challenge: \n" + gson.toJson(mChallenge));
 
         new UniqueIDAsyncTask().execute(new UniqueIDAsyncTaskParams(
                 getApplicationContext(),
                false,false,
-                challenge,
+                gson.toJson(mChallenge),
                 this::updateUIandLogOutput
         ));
     }
@@ -86,12 +97,38 @@ public class MainActivity extends Activity {
                 Log.i(TAG, "Verified boot state: " + verifiedBootState);
             }
 
-            Log.i(TAG, String.format("Challenge: %s", new String(attestation.getAttestationChallenge())));
+            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+            Challenge challenge = new Gson().fromJson(new String(attestation.getAttestationChallenge()), Challenge.class);
+
+            Log.i(TAG, String.format("Challenge: %s", gson.toJson(challenge)));
+            Log.i(TAG, String.format("Challenge is valid: %b", isValidChallenge(challenge)));
+
             Log.i(TAG, String.format("Challenge Length: %d", attestation.getAttestationChallenge().length));
 
         } catch (CertificateParsingException e) {
             e.printStackTrace();
         }
+    }
+
+    Boolean isValidChallenge(Challenge challenge) {
+
+        boolean result = true;
+        if (challenge.nonce.expirationEpoc < new Date().toInstant().toEpochMilli()) {
+            Log.e(TAG, "Challenge was expired");
+            result = false;
+        }
+
+        if (!mChallenge.nonce.value.equals(challenge.nonce.value)) {
+            Log.e(TAG, "Invalid Nonce value returned in certificate");
+            result = false;
+        }
+
+        if (!mChallenge.signiture.equals(challenge.signiture)) {
+            Log.e(TAG, "Invalid Challenge signiture returned in certificate");
+            result = false;
+        }
+
+        return result;
     }
 
     private boolean hasSystemFeature(String feature) {
@@ -102,6 +139,7 @@ public class MainActivity extends Activity {
     private boolean isDeviceIdAttestationSupported() {
         DevicePolicyManager dpm =
                 (DevicePolicyManager) getApplication().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        assert dpm != null;
         return dpm.isDeviceIdAttestationSupported();
     }
 
