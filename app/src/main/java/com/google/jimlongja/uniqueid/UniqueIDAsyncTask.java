@@ -46,6 +46,7 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
         }
         Context context = params[0].context;
         Boolean fromDevicePolicyManager = params[0].fromDevicePolicyManager;
+        Boolean attestDeviceProperties = params[0].attestDeviceProperties;
         mCallback = params[0].callback;
         String challenge = params[0].challenge;
 
@@ -53,7 +54,7 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
                     KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
 
-            KeyGenParameterSpec keyGenParameterSpec = buildKeyGenParameterSpec(challenge);
+            KeyGenParameterSpec keyGenParameterSpec = buildKeyGenParameterSpec(challenge, attestDeviceProperties);
 
             try {
                 boolean isAttestToDeviceProperties = (boolean) ReflectionUtil.invoke(keyGenParameterSpec, "isAttestToDeviceProperties");
@@ -122,7 +123,7 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
         mCallback.onComplete(x509cert);
     }
 
-    private KeyGenParameterSpec buildKeyGenParameterSpec(String challenge) {
+    private KeyGenParameterSpec buildKeyGenParameterSpec(String challenge, Boolean attestDeviceProperties) {
 
         Date KeyValidityStart = new Date();
         Date KeyValidyForOriginationEnd =
@@ -153,7 +154,7 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
         // Use reflection until new API signitures get update in the Android SDK
         // Print exception and continue if method is not present
         try {
-            ReflectionUtil.invoke(builder, "setAttestToDeviceProperties", new Class<?>[]{boolean.class}, false);
+            ReflectionUtil.invoke(builder, "setAttestToDeviceProperties", new Class<?>[]{boolean.class}, attestDeviceProperties);
             Log.i(TAG, "setAttestToDeviceProperties:  Supported");
         } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
             Log.i(TAG, "setAttestToDeviceProperties:  Not supported");

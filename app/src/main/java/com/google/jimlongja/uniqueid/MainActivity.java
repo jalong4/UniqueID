@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
 
         new UniqueIDAsyncTask().execute(new UniqueIDAsyncTaskParams(
                 getApplicationContext(),
-               false,
+               false,false,
                 challenge,
                 this::updateUIandLogOutput
         ));
