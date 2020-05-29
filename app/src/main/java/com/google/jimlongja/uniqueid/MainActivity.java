@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
     private static final String SOFTWARE_DEVICE_ID_ATTESTATION =
             "android.software.device_id_attestation";
     private static final String TAG = "UniqueID";
-    private static final long ONE_MINUTE_IN_MILLIS=60000;//millisecs
+    private static final long ONE_MINUTE_IN_MILLIS=60000;
     private Challenge mChallenge;
 
     @Override
@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 
         new UniqueIDAsyncTask().execute(new UniqueIDAsyncTaskParams(
                 getApplicationContext(),
-               false,false,
+               false,
                 gson.toJson(mChallenge),
                 this::updateUIandLogOutput
         ));
