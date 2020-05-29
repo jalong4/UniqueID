@@ -57,10 +57,10 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
             KeyGenParameterSpec keyGenParameterSpec = buildKeyGenParameterSpec(challenge, attestDeviceProperties);
 
             try {
-                boolean isAttestToDeviceProperties = (boolean) ReflectionUtil.invoke(keyGenParameterSpec, "isAttestToDeviceProperties");
-                Log.i(TAG, "isAttestToDeviceProperties: " + (isAttestToDeviceProperties ? "true" : "false"));
+                boolean isAttestToDeviceProperties = (boolean) ReflectionUtil.invoke(keyGenParameterSpec, "isDevicePropertiesAttestationIncluded");
+                Log.i(TAG, "isDevicePropertiesAttestationIncluded: " + (isAttestToDeviceProperties ? "true" : "false"));
             } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-                Log.i(TAG, "isAttestToDeviceProperties:  Not supported");
+                Log.i(TAG, "isDevicePropertiesAttestationIncluded:  Not supported");
             }
 
             Log.i(TAG, "Generating keypair using: " +
@@ -145,7 +145,7 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
                 // Request an attestation with challenge
                 .setAttestationChallenge(challenge.getBytes())
 
-//                .setAttestToDeviceProperties(true)
+//                .setDevicePropertiesAttestationIncluded(true)
 
                 .setKeyValidityStart(KeyValidityStart)
                 .setKeyValidityForOriginationEnd(KeyValidyForOriginationEnd)
@@ -154,10 +154,10 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
         // Use reflection until new API signitures get update in the Android SDK
         // Print exception and continue if method is not present
         try {
-            ReflectionUtil.invoke(builder, "setAttestToDeviceProperties", new Class<?>[]{boolean.class}, attestDeviceProperties);
-            Log.i(TAG, "setAttestToDeviceProperties:  Supported");
+            ReflectionUtil.invoke(builder, "setDevicePropertiesAttestationIncluded", new Class<?>[]{boolean.class}, attestDeviceProperties);
+            Log.i(TAG, "setDevicePropertiesAttestationIncluded:  Supported");
         } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.i(TAG, "setAttestToDeviceProperties:  Not supported");
+            Log.i(TAG, "setDevicePropertiesAttestationIncluded:  Not supported");
         }
 
         return builder.build();
