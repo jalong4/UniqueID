@@ -13,12 +13,14 @@ import com.google.common.io.BaseEncoding;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
@@ -45,7 +47,7 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
             return null;
         }
         Context context = params[0].context;
-        Boolean fromDevicePolicyManager = params[0].fromDevicePolicyManager;
+        Boolean fromDevicePolicyManager = false;
         mCallback = params[0].callback;
         String challenge = params[0].challenge;
 
@@ -58,9 +60,7 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
             Log.i(TAG, "Generating keypair using: " +
                     (fromDevicePolicyManager ? "Device Policy Manager" : "KeyStore"));
 
-            List<Certificate> certificates = fromDevicePolicyManager ?
-                    getCertificateChainFromDevicePolicyManager(context, keyPairGenerator,keyGenParameterSpec) :
-                    getCertificateChainFromKeyStore(keyPairGenerator, keyGenParameterSpec);
+            List<Certificate> certificates = getCertificateChainFromKeyStore(keyPairGenerator, keyGenParameterSpec);
 
 
             if (certificates == null || certificates.get(0) == null) {
@@ -76,36 +76,41 @@ public class UniqueIDAsyncTask extends AsyncTask<UniqueIDAsyncTaskParams, Intege
             return x509cert;
 
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | KeyStoreException |
-                IOException | NoSuchProviderException | CertificateException e) {
+                IOException | NoSuchProviderException | CertificateException  |
+                InvalidKeyException e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    private List<Certificate> getCertificateChainFromDevicePolicyManager(
-            Context context,
-            KeyPairGenerator keyPairGenerator,
-            KeyGenParameterSpec keyGenParameterSpec) {
-
-        DevicePolicyManager devicePolicyManager =
-                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        ComponentName componentName = ComponentName.createRelative(context, ".UniqueIDAdminReceiver");
-
-        AttestedKeyPair keyPair = devicePolicyManager.generateKeyPair(componentName,
-                keyPairGenerator.getAlgorithm(),
-                keyGenParameterSpec,
-                DevicePolicyManager.ID_TYPE_BASE_INFO);
-
-        return keyPair == null ? null : keyPair.getAttestationRecord();
-    }
+//    private List<Certificate> getCertificateChainFromDevicePolicyManager(
+//            Context context,
+//            KeyPairGenerator keyPairGenerator,
+//            KeyGenParameterSpec keyGenParameterSpec) {
+//
+//        DevicePolicyManager devicePolicyManager =
+//                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+//        ComponentName componentName = ComponentName.createRelative(context, ".UniqueIDAdminReceiver");
+//
+//        AttestedKeyPair keyPair = devicePolicyManager.generateKeyPair(componentName,
+//                keyPairGenerator.getAlgorithm(),
+//                keyGenParameterSpec,
+//                DevicePolicyManager.ID_TYPE_BASE_INFO);
+//
+//        return keyPair == null ? null : keyPair.getAttestationRecord();
+//    }
 
     private List<Certificate> getCertificateChainFromKeyStore(
             KeyPairGenerator keyPairGenerator,
-            KeyGenParameterSpec keyGenParameterSpec) throws InvalidAlgorithmParameterException, KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+            KeyGenParameterSpec keyGenParameterSpec) throws InvalidAlgorithmParameterException, KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, InvalidKeyException {
 
         keyPairGenerator.initialize(keyGenParameterSpec);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+        Signature signature = Signature.getInstance("SHA256withRSA/PSS");
+        signature.initSign(keyPair.getPrivate());
+
         KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
         keyStore.load(null);
         return Arrays.asList(keyStore.getCertificateChain(KEYSTORE_ALIAS));
