@@ -30,6 +30,7 @@ public class MainActivity extends Activity {
     private static final String TAG = "UniqueID";
     private static final long ONE_MINUTE_IN_MILLIS=60000;
     private Challenge mChallenge;
+    private WidevineProperties mWidevineProperties = new WidevineProperties();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class MainActivity extends Activity {
                 "MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY=");
 
         Log.i(TAG,"Challenge: \n" + gson.toJson(mChallenge));
+        Log.i(TAG,mWidevineProperties.toString());
 
         new UniqueIDAsyncTask().execute(new UniqueIDAsyncTaskParams(
                 getApplicationContext(),
